@@ -36,10 +36,10 @@ void usDelay(uint32_t us)
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int sensor_time;
-int distance;
-int local_time=0;
-/* USER CODE END PTD */
+int sensor_time; //zmienna pomocnicza
+int distance; //zmienna pomocnicze
+int local_time=0; //zmienan pomocnicza
+/* USER CODE END PTD */ 
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
