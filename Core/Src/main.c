@@ -137,7 +137,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
-  MX_USART2_UART_Init();
+  MX_USART2_UART_Init(); //dodanie usarta
   /* USER CODE BEGIN 2 */
   void usDelay(uint32_t us);
   uint8_t powerSet = 0x2;																//ustawienie bitow POWER_CTL
@@ -147,7 +147,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+  while (1) 
   {
     /* USER CODE END WHILE */
   HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
