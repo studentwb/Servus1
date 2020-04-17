@@ -148,7 +148,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) 
-  {
+  {//tutaj ma znalezc sie kod do obslugi akcelometru i czujnikow
     /* USER CODE END WHILE */
   HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
 	  Xaxis = Data << 8;														//zapisanie danych
