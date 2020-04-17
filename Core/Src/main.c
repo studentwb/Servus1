@@ -27,6 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <limits.h>
 void usDelay(uint32_t us)
 {
 	 __HAL_TIM_SET_COUNTER(&htim4, 0);
@@ -51,13 +52,29 @@ int local_time=0; //zmienan pomocnicza
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
+I2C_HandleTypeDef hi2c1;
 /* USER CODE BEGIN PV */
+#define ADXL345_DEVICE 0x53		//adres czujnika
+#define ADXL345_POWER_CTL 0x2D	//wlaczenie
+#define ADXL345_H_X 0x08		//mniej szczegołowe dane z osi x
+#define ADXL345_H_Y 0x0B
+#define ADXL345_H_Z 0x0E
+#define ADXL345_RANGE (19.6246)	//aktualna maksymalna wartość mierzona
 
+uint8_t Data = 0;	//przechowuje zczytane dane
+int16_t Xaxis = 0;	//surowe dane z osi x
+float XaxisMS = 0;	//dane z osi x w m/s^2
+int16_t Yaxis = 0;
+float YaxisMS = 0;
+int16_t Zaxis = 0;
+float ZaxisMS = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_GPIO_Init(void);
+void MX_I2C1_Init(void);
+void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -120,8 +137,12 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   void usDelay(uint32_t us);
+  uint8_t powerSet = 0x2;																//ustawienie bitow POWER_CTL
+  HAL_I2C_Mem_Write(&hi2c1, ADXL345_DEVICE, ADXL345_POWER_CTL, 1, &powerSet, 1, 100);	//wpisanie bitow do rejestru
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -129,7 +150,17 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+  HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
+	  Xaxis = Data << 8;														//zapisanie danych
+	  XaxisMS = ((float)Xaxis*ADXL345_RANGE)/(float)INT16_MAX;					//przetworzenie na jednostke
 
+	  HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_Y, 1, &Data, 1, 100);
+	  Yaxis = Data << 8;
+	  YaxisMS = ((float)Yaxis*ADXL345_RANGE)/(float)INT16_MAX;
+
+	  HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_Z, 1, &Data, 1, 100);
+	  Zaxis = Data << 8;
+	  ZaxisMS = ((float)Zaxis*ADXL345_RANGE)/(float)INT16_MAX;
     /* USER CODE BEGIN 3 */
 	 	  sensor_time = hcsr04_read();
 	 	  distance  = sensor_time * .034/2;
