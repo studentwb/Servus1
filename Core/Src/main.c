@@ -143,7 +143,7 @@ void stepper_half_drive (int step) //tutaj nalezy dostosowac moc
 		}
 }
 
-uint32_t hcsr04_read (void)
+uint32_t hcsr04_read (void) //czujnik
 {
 	local_time=0;
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);  // pull the TRIG pin low
