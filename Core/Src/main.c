@@ -337,7 +337,7 @@ void stepper_step_angle_2 (float angle, int direction, int rpm)
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int main(void) //do optymalizacji
 {
   /* USER CODE BEGIN 1 */
 
