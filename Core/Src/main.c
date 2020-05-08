@@ -240,7 +240,7 @@ int main(void)
   {//tutaj ma znalezc sie kod do obslugi akcelometru i czujnikow
     /* USER CODE END WHILE */
 	    stepper_step_angle(22.5, 1, 12); //rozrouch silnika
-	  
+	  //wrzuć tutaj algorytm jeżdżenia
   HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
 	  Xaxis = Data << 8;														//zapisanie danych
 	  XaxisMS = ((float)Xaxis*ADXL345_RANGE)/(float)INT16_MAX;					//przetworzenie na jednostke
