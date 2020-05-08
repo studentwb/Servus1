@@ -82,10 +82,13 @@ void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// Tą funkcje i tak trzemma wywalić i zstąpić konfiguracją timera, bo to zabiera nam czas procka.
 // funkcja sterująca wybranym silnikiem
-// motoNr: 0 - obydwa, 1 - pierwszy, 2 - drugi. n - ilosc skoków, delay - ?
-void motorCTL(int motorNr, int n, int delay)
+// motoNr: 0 - obydwa, 1 - pierwszy, 2 - drugi. n - ilosc skoków, speed - predkosc oborotowa rpm
+void motorCTL(int motorNr, int n, int speed)
 {
+	if(speed > 0){
+	int delay = 1/speed*300;
 	for(int i=0; i<n; i++)
 	{
 		if(motorNr == 1 || motorNr == 0){
@@ -97,6 +100,7 @@ void motorCTL(int motorNr, int n, int delay)
 			HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_RESET);
 		}
 		HAL_Delay(delay);
+	}
 	}
 }
 			
