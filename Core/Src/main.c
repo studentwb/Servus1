@@ -139,7 +139,12 @@ void stepper_half_drive (int step) //tutaj nalezy dostosowac moc oraz cewki
 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);   // IN3
 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);   // IN4
 			  break;
-
+		case 8: //stop
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);   // IN1
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);   // IN2
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);   // IN3
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);   // IN4
+			  break;
 		}
 }
 
@@ -188,6 +193,10 @@ void stepper_step_angle (float angle, int direction, int rpm)
 				stepper_half_drive(step);
 				stepper_set_rpm(rpm);
 			}
+		}
+		else 
+		{
+			
 		}
 	}
 }
