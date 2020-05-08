@@ -234,9 +234,9 @@ uint32_t hcsr04_read (void) //czujnik
 	 }
 	return local_time;
 }
-void stepper_step_angle (float angle, int direction, int rpm)
+void stepper_step_angle_1 (float angle, int direction, int rpm) 
 {
-	float anglepersequence = 0.703125;  // 360 = 512 sequences
+	float anglepersequence = 0.703125;  //tutaj zmienic
 	int numberofsequences = (int) (angle/anglepersequence);
 
 	for (int seq=0; seq<numberofsequences; seq++)
@@ -245,7 +245,7 @@ void stepper_step_angle (float angle, int direction, int rpm)
 		{
 			for (int step=7; step>=0; step--)
 			{
-				stepper_half_drive(step);
+				stepper_half_drive_1(step);
 				stepper_set_rpm(rpm);
 			}
 
@@ -255,18 +255,57 @@ void stepper_step_angle (float angle, int direction, int rpm)
 		{
 			for (int step=0; step<8; step++)
 			{
-				stepper_half_drive(step);
+				stepper_half_drive_1(step);
 				stepper_set_rpm(rpm);
 			}
 		}
-		else 
+		else if (direction==2) //stop
 		{
-			int step=8
-			stepper_half_drive(step);
+		 	while (1){
+			step=8;
+			stepper_half_drive_1(step);
 			stepper_set_rpm(rpm);
+   			}
 		}
 	}
 }
+
+void stepper_step_angle_2 (float angle, int direction, int rpm) 
+{
+	float anglepersequence = 0.703125;  //tutaj zmienic z noty katalogowej
+	int numberofsequences = (int) (angle/anglepersequence);
+
+	for (int seq=0; seq<numberofsequences; seq++)
+	{
+		if (direction == 0)  // for clockwise
+		{
+			for (int step=7; step>=0; step--)
+			{
+				stepper_half_drive_2(step);
+				stepper_set_rpm(rpm);
+			}
+
+		}
+
+		else if (direction == 1)  // for anti-clockwise
+		{
+			for (int step=0; step<8; step++)
+			{
+				stepper_half_drive_2(step);
+				stepper_set_rpm(rpm);
+			}
+		}
+		else if (direction==2) //stop
+		{
+		 	while (1){
+			int step=8;
+			stepper_half_drive_2(step);
+			stepper_set_rpm(rpm);
+   			}
+		}
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
