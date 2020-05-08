@@ -196,7 +196,9 @@ void stepper_step_angle (float angle, int direction, int rpm)
 		}
 		else 
 		{
-			
+			int step=8
+			stepper_half_drive(step);
+			stepper_set_rpm(rpm);
 		}
 	}
 }
