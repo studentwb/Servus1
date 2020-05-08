@@ -82,7 +82,8 @@ void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-//funkcja sterująca wybranym silnikiem
+// funkcja sterująca wybranym silnikiem
+// motoNr: 0 - obydwa, 1 - pierwszy, 2 - drugi. n - ilosc skoków, delay - ?
 void motorCTL(int motorNr, int n, int delay)
 {
 	for(int i=0; i<n; i++)
