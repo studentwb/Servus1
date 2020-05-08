@@ -393,11 +393,36 @@ int main(void)
 	  Zaxis = Data << 8;
 	  ZaxisMS = ((float)Zaxis*ADXL345_RANGE)/(float)INT16_MAX;
     /* USER CODE BEGIN 3 */
-	 	  sensor_time = hcsr04_read();
-	 	  distance  = sensor_time * .034/2;
+	 		  stepper_step_angle(22.5, 1, 12);
+	  sensor_time_1 = hcsr04_read_1();
+	  sensor_time_2 = hcsr04_read_2();
+	  distance_1  = sensor_time_1 * .034/2;
+	  distance_2  = sensor_time_2 * .034/2;
+		if(distance_1==40){//skreca w prawo
+		stepper_step_angle_1(22.5, 1, 12);
+		stepper_step_angle_2(22.5, 1, 12);	
+		HAL_Delay(200);	
+		}
+		if (distance2==40){//skreca w lewo
+		stepper_step_angle_1(22.5, 1, 12);
+		stepper_step_angle_2(22.5, 1, 12);
+		HAL_Delay(200);
+		}
+		if(distance1==40 && distance2==40) //jedzie do tylu i sie obraca
+		{
+		stepper_step_angle_1(22.5, 1, 12);
+		stepper_step_angle_2(12.5, 0, 12);	
+		HAL_Delay(200);	
+		}
+		else // jedzie do przodu
+		{
+		stepper_step_angle_1(22.5, 0, 12);
+		stepper_step_angle_2(22.5, 1, 12);
+		HAL_Delay(200);
+		}
 
+	  HAL_Delay(200);
 
-	 	  HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
