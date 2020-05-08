@@ -83,9 +83,20 @@ void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN 0 */
 
 //funkcja sterująca wybranym silnikiem
-void motorCTL(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, int n, int delay)
+void motorCTL(int motorNr, int n, int delay)
 {
-	
+	for(int i=0; i<n; i++)
+	{
+		if(motorNr == 1 || motorNr == 0){
+			HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_RESET);
+		}
+		if(motorNr == 2 || motorNr == 0){
+			HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_RESET);
+		}
+		HAL_Delay(delay);
+	}
 }
 			
 					    
