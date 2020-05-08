@@ -28,7 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <limits.h>
-void usDelay(uint32_t us)
+void usDelay(uint32_t us) // tutaj trzeba będzie zmienić timer
 {
 	 __HAL_TIM_SET_COUNTER(&htim4, 0);
 	  while (__HAL_TIM_GET_COUNTER(&htim4) < us);
