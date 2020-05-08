@@ -81,7 +81,7 @@ void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void stepper_half_drive (int step) //tutaj nalezy dostosowac moc 
+void stepper_half_drive (int step) //tutaj nalezy dostosowac moc oraz cewki
 {
 	switch (step){
 		case 0:
