@@ -393,7 +393,8 @@ int main(void) //do optymalizacji
 	  Zaxis = Data << 8;
 	  ZaxisMS = ((float)Zaxis*ADXL345_RANGE)/(float)INT16_MAX;
     /* USER CODE BEGIN 3 */
-	 		 // stepper_step_angle(22.5, 1, 12);
+	  // czemu to było w komentarzu?
+		stepper_step_angle(22.5, 1, 12);
 	  sensor_time_1 = hcsr04_read_1();
 	  sensor_time_2 = hcsr04_read_2();
 	  distance_1  = sensor_time_1 * .034/2;
