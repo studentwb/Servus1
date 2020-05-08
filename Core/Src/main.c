@@ -84,23 +84,37 @@ void MX_USART2_UART_Init(void);
 
 // Tą funkcje i tak trzemma wywalić i zstąpić konfiguracją timera, bo to zabiera nam czas procka.
 // funkcja sterująca wybranym silnikiem
-// motoNr: 0 - obydwa, 1 - pierwszy, 2 - drugi. n - ilosc skoków, speed - predkosc oborotowa rpm
-void motorCTL(int motorNr, int n, int speed)
+// motoNr: -1 - do tylu, 1 - na przód, 2 - skret w prawo, 3 skret w lewo. n - ilosc skoków, speed - predkosc oborotowa rpm
+void motorCTL(int control, int n, int speed)
 {
-	if(speed > 0){
-	int delay = 1/speed*300;
+	if(control == -1){
+		HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_RESET);
+	}
+	else if(control == 1){
+		HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_SET);
+	}
+	else if(control == 2){
+		HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_RESET);
+	}
+	else if(control == 3){
+		HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_SET);
+	}
+	
+	if(speed != 0){
+		int delay = 1/abs(speed)*300;
 	for(int i=0; i<n; i++)
 	{
-		if(motorNr == 1 || motorNr == 0){
 			HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(STEP1_GPIO_Port, STEP1_Pin, GPIO_PIN_RESET);
-		}
-		if(motorNr == 2 || motorNr == 0){
+		
 			HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_SET);
 			HAL_GPIO_WritePin(STEP2_GPIO_Port, STEP2_Pin, GPIO_PIN_RESET);
 		}
 		HAL_Delay(delay);
-	}
 	}
 }
 			
