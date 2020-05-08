@@ -288,7 +288,7 @@ int main(void) //do optymalizacji
     /* USER CODE END WHILE */
 	    stepper_step_angle(22.5, 1, 12); //rozrouch silnika
 	  //wrzuć tutaj algorytm jeżdżenia
-  HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
+  	HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, ADXL345_H_X, 1, &Data, 1, 100);	//zczytanie danych z osi x
 	  Xaxis = Data << 8;														//zapisanie danych
 	  XaxisMS = ((float)Xaxis*ADXL345_RANGE)/(float)INT16_MAX;					//przetworzenie na jednostke
 
@@ -300,37 +300,30 @@ int main(void) //do optymalizacji
 	  Zaxis = Data << 8;
 	  ZaxisMS = ((float)Zaxis*ADXL345_RANGE)/(float)INT16_MAX;
     /* USER CODE BEGIN 3 */
-	  // czemu to było w komentarzu?
-		stepper_step_angle(22.5, 1, 12);
 	  sensor_time_1 = hcsr04_read_1();
 	  sensor_time_2 = hcsr04_read_2();
 	  distance_1  = sensor_time_1 * .034/2;
 	  distance_2  = sensor_time_2 * .034/2;
 	  //proste omijanie
 		if(distance_1==40){//skreca w prawo
-		stepper_step_angle_1(22.5, 1, 12);
-		stepper_step_angle_2(22.5, 1, 12);	
+		motorCTL(2,200,60);
 		HAL_Delay(200);	
 		}
 		if (distance2==40){//skreca w lewo
-		stepper_step_angle_1(22.5, 0, 12);
-		stepper_step_angle_2(22.5, 0, 12);
+		motorCTL(3,200,60);
 		HAL_Delay(200);
 		}
 		if(distance1==40 && distance2==40) //jedzie do tylu i sie obraca
 		{
-		stepper_step_angle_1(22.5, 1, 12);
-		stepper_step_angle_2(12.5, 0, 12);	
+		motorCTL(-1,200,60);
+		motorCTL(3,400,60);
 		HAL_Delay(200);	
 		}
 		else // jedzie do przodu
 		{
-		stepper_step_angle_1(22.5, 0, 12);
-		stepper_step_angle_2(22.5, 1, 12);
+		motorCTL(1,200,60);
 		HAL_Delay(200);
 		}
-
-	  HAL_Delay(200);
 
   }
   /* USER CODE END 3 */
