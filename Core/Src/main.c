@@ -404,8 +404,8 @@ int main(void) //do optymalizacji
 		HAL_Delay(200);	
 		}
 		if (distance2==40){//skreca w lewo
-		stepper_step_angle_1(22.5, 1, 12);
-		stepper_step_angle_2(22.5, 1, 12);
+		stepper_step_angle_1(22.5, 0, 12);
+		stepper_step_angle_2(22.5, 0, 12);
 		HAL_Delay(200);
 		}
 		if(distance1==40 && distance2==40) //jedzie do tylu i sie obraca
