@@ -213,26 +213,51 @@ void stepper_half_drive_2 (int step) //silnik 2
 			  break;
 		}
 }
-uint32_t hcsr04_read (void) //czujnik
+			    
+			
+					    
+uint32_t hysrf05_read_1 (void)
 {
-	local_time=0;
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);  // pull the TRIG pin low
-	usDelay(2);  // wait for 2 us
+	local_time_1=0;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
+	delay(2);  // wait for 2 us
 
 
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);  // pull the TRIG pin HIGH
-	usDelay(10);  // wait for 10 us
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);  // pull the TRIG pin low
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);  // pull the TRIG pin HIGH
+	delay(10);  // wait for 10 us
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);  // pull the TRIG pin low
 
 	// read the time for which the pin is high
 
-	while (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9)));  // wait for the ECHO pin to go high
-	while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9))    // while the pin is high
+	while (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_14)));  // wait for the ECHO pin to go high
+	while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_14))    // while the pin is high
 	 {
-		local_time++;   // measure time for which the pin is high
-		usDelay (1);
+		local_time_1++;   // measure time for which the pin is high
+		delay (1);
 	 }
-	return local_time;
+	return local_time_1;
+}
+
+uint32_t hysrf05_read_2 (void)
+{
+	local_time_2=0;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);  // pull the TRIG pin HIGH
+	delay(2);  // wait for 2 us
+
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);  // pull the TRIG pin HIGH
+	delay(10);  // wait for 10 us
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);  // pull the TRIG pin low
+
+	// read the time for which the pin is high
+
+	while (!(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_19)));  // wait for the ECHO pin to go high
+	while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_19))    // while the pin is high
+	 {
+		local_time_2++;   // measure time for which the pin is high
+		delay (1);
+	 }
+	return local_time_2;
 }
 void stepper_step_angle_1 (float angle, int direction, int rpm) 
 {
