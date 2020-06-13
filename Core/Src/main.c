@@ -203,7 +203,7 @@ void stepper_step_angle_1 (float angle, int direction, int rpm)
 
 void stepper_step_angle_2 (float angle, int direction, int rpm) 
 {
-	float anglepersequence = 0.703125;  //tutaj zmienic z noty katalogowej
+	float anglepersequence = 0.703125;  //tutaj zmienic z noty  katalogowej
 	int numberofsequences = (int) (angle/anglepersequence);
 
 	for (int seq=0; seq<numberofsequences; seq++)
