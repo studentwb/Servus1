@@ -166,7 +166,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-	CoreDebug->DEMCR &= ~0x01000000;
+	CoreDebug->DEMCR &= ~0x01000000; //tutaj potem dodaj komentarze
 	CoreDebug->DEMCR |=  0x01000000;
 	DWT->CTRL &= ~0x00000001;
 	DWT->CTRL |=  0x00000001;
