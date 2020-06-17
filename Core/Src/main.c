@@ -40,7 +40,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define n 4 //rozmiar historii pomiarów
+#define n 100 //rozmiar historii pomiarów
 /*
 #define ADXL345_DEVICE_W 0xA6 // adres urządzenia w trybie zapisu
 #define ADXL345_DEVICE_R 0xA7 // adres urządzenia w trybie odczytu
@@ -232,15 +232,15 @@ void rejestruj()
 
 	//zapisz dane do histori
 	if(nP<n){
-		sP[nP][0]=ECHOP_Pulse/64/58;
-		sL[nP][0]=ECHOL_Pulse/64/58;
+		sP[nP][0]=P;
+		sL[nP][0]=L;
 		sP[nP][1]=0;
 		sL[nP][1]=0;
 		nP++;
 	}else
 	{
-		sP[nP%n][1]=ECHOP_Pulse/64/58;
-		sL[nP%n][1]=ECHOL_Pulse/64/58;
+		sP[nP%n][1]=P;
+		sL[nP%n][1]=L;
 		sP[nP%n][0]=0;
 		sL[nP%n][0]=0;
 		nP++;
@@ -249,6 +249,96 @@ void rejestruj()
 	//cofnij wskaźnik
 	if(nP==2*n)
 		nP=0;
+}
+
+void decyduj()
+{
+	int P[n];
+	int L[n];
+	int i=0, maxP=0, maxPid=0, maxL=0, maxLid=0;
+	P[0]=0;
+	L[0]=0;
+
+	// Układa dane chronologicznie w tablicy
+	if(sP[0][0]>0)
+	{
+		for(int j=n-1; j>=0; j--)
+			if(sP[j][0]>0)
+				P[i++]=sP[j][0];
+		for(int j=n-1; j>=0; j--)
+			if(sP[j][1]>0)
+				P[i++]=sP[j][1];
+	}else
+	{
+		for(int j=n-1; j>=0; j--)
+			if(sP[j][1]>0)
+				P[i++]=sP[j][1];
+		for(int j=n-1; j>=0; j--)
+			if(sP[j][0]>0)
+				P[i++]=sP[j][0];
+	}
+
+	i=0;
+
+	if(sL[0][0]>0)
+	{
+		for(int j=n-1; j>=0; j--)
+			if(sL[j][0]>0)
+				L[i++]=sL[j][0];
+		for(int j=n-1; j>=0; j--)
+			if(sL[j][1]>0)
+				L[i++]=sL[j][1];
+	}else
+	{
+		for(int j=n-1; j>=0; j--)
+			if(sL[j][1]>0)
+				L[i++]=sL[j][1];
+		for(int j=n-1; j>=0; j--)
+			if(sL[j][0]>0)
+				L[i++]=sL[j][0];
+	}
+
+	// podstawowy algorytm
+	if(komenda==1 && P[0]!=0 && L[0]!=0)
+	{
+		//szukanie większej przestrzeni
+		for(int j=0; j<n; j++)
+			if(maxP<P[j])
+			{
+				maxP=P[j];
+				maxPid=j;
+			}
+
+		for(int j=0; j<n; j++)
+			if(maxL<L[j])
+			{
+				maxL=L[j];
+				maxLid=j;
+			}
+
+
+
+		//zabezpieczona komenda jedź
+		if(P[0]>30 && L[0]>30)
+			jazda(1);
+
+		//skręt w razie ściany
+		if(P[0]<=30 || L[0]<=30)
+		{
+			if(maxP>maxL)
+			{
+				jazda(2);
+				HAL_Delay(maxPid*100);
+				jazda(0);
+			}else{
+				jazda(3);
+				HAL_Delay(maxLid*100);
+				jazda(0);
+			}
+			if(P[0]>30 && L[0]>30)
+				jazda(1);
+		}
+	}
 }
 /*
 void odczytPrzys()
@@ -316,20 +406,16 @@ int main(void)
 	  sprawdzRadio();
 	  if(komenda==0)
 		  jazda(0);
-	  else if(komenda==1)
-		  jazda(1);
 	  else if(komenda==2)
 		  jazda(2);
 	  else if(komenda==3)
 		  jazda(3);
 
-	  //pokazPomiar();
-
 	  rejestruj();
 
-	  //decyduj();
+	  decyduj();
 
-	  HAL_Delay(200);
+	  HAL_Delay(20);
   }
   /* USER CODE END 3 */
 }
