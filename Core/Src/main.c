@@ -268,7 +268,8 @@ void decyduj()
 		for(int j=n-1; j>=0; j--)
 			if(sP[j][1]>0)
 				P[i++]=sP[j][1];
-	}else
+	}
+	else
 	{
 		for(int j=n-1; j>=0; j--)
 			if(sP[j][1]>0)
@@ -277,9 +278,7 @@ void decyduj()
 			if(sP[j][0]>0)
 				P[i++]=sP[j][0];
 	}
-
 	i=0;
-
 	if(sL[0][0]>0)
 	{
 		for(int j=n-1; j>=0; j--)
@@ -288,7 +287,8 @@ void decyduj()
 		for(int j=n-1; j>=0; j--)
 			if(sL[j][1]>0)
 				L[i++]=sL[j][1];
-	}else
+	}
+	else
 	{
 		for(int j=n-1; j>=0; j--)
 			if(sL[j][1]>0)
@@ -297,7 +297,6 @@ void decyduj()
 			if(sL[j][0]>0)
 				L[i++]=sL[j][0];
 	}
-
 	// podstawowy algorytm
 	if(komenda==1 && P[0]!=0 && L[0]!=0)
 	{
@@ -315,13 +314,9 @@ void decyduj()
 				maxL=L[j];
 				maxLid=j;
 			}
-
-
-
 		//zabezpieczona komenda jedź
 		if(P[0]>30 && L[0]>30)
 			jazda(1);
-
 		//skręt w razie ściany
 		if(P[0]<=30 || L[0]<=30)
 		{
