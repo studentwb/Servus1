@@ -40,15 +40,16 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-//#define n 100 //rozmiar historii pomiarów
+#define n 4 //rozmiar historii pomiarów
 /*
-#define ADXL345_DEVICE 0x53<<1
+#define ADXL345_DEVICE_W 0xA6 // adres urządzenia w trybie zapisu
+#define ADXL345_DEVICE_R 0xA7 // adres urządzenia w trybie odczytu
 #define ADXL345_POWER 0x2D
-#define ADXL345_X 0x08
-#define ADXL345_Y 0x0B
-#define ADXL345_Z 0x0E
-#define ADXL345_RANGE 0x31
-*/
+#define ADXL345_X 0x32 // rejestr przyspieszenia na OX (LSB)
+#define ADXL345_Y 0x34 // rejestr przyspieszenia na OY (LSB)
+//#define ADXL345_RANGE 0x31
+ */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,14 +65,15 @@ volatile int komenda;
 
 volatile _Bool ECHOL_High;
 volatile _Bool ECHOP_High;
-volatile uint32_t ECHOL_Pulse;
-volatile uint32_t ECHOP_Pulse;
+volatile uint32_t ECHOL_Pulse; // surowy pomiar z lewego czujnika odległości
+volatile uint32_t ECHOP_Pulse; // surowy pomiar z prawego czujnika odległości
+volatile int nP; // wskaźnik historii
+volatile _Bool resetuj;
 
-float XaxisMS;
-float YaxisMS;
-//double sL[n]; //odleglosc od lewego czujnika z 10 sekund
-//double sP[n]; //odleglosc od prawego czujnika z 10 sekund
-
+//float XaxisMS;
+//float YaxisMS;
+int sL[n][2]; //odleglości z lewego czujnika
+int sP[n][2]; //odleglości z prawego czunika
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,6 +84,7 @@ int _write(int file, char *ptr, int len){
 	HAL_UART_Transmit(&huart2, (uint8_t*)ptr, len, 50);
 	return len;
 }
+
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == ECHOP_Pin)
@@ -107,20 +110,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /*
-void writeI2C(uint8_t r, uint8_t wart)
+// zapis do urządzenia
+void ADXL345_zapis(uint8_t adresRejestru, uint16_t ileDanych, uint8_t wskDane)
 {
-	uint8_t data[2];
-	data[0] = r;
-	data[1] = wart;
-	HAL_I2C_Master_Transmit(&hi2c1, ADXL345_DEVICE, data, 2, 10);
+	HAL_I2C_Mem_Write(&hi2c1, 0x53, adresRejestru, 1, &wskDane, ileDanych, 100);
 }
 
-void readI2C(uint8_t r, uint8_t ile)
+// odczyt z urządzenia
+// \return uint8_t dane zwrotne
+uint8_t ADXL345_odczyt(uint8_t adresRejestru, uint16_t ileDanych)
 {
-	HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, r, 1, Data, ile, 100);
+	uint8_t bufor;
+	HAL_I2C_Mem_Read(&hi2c1, 0x53, adresRejestru, 1, &bufor, ileDanych, 100);
+	return bufor;
 }
-
 */
+
 void initDWT()
 {
 	CoreDebug->DEMCR &= ~0x01000000;
@@ -132,12 +137,7 @@ void initDWT()
 /*
 void initADXL345()
 {
-	readI2C(0x00, 1);
-
-	writeI2C(ADXL345_POWER, 0);
-	writeI2C(ADXL345_POWER, 0x08);
-
-	writeI2C(ADXL345_RANGE, 0x01);
+	ADXL345_zapis(ADXL345_POWER, 1, 0x08);
 }
 */
 void initSTEP()
@@ -150,8 +150,8 @@ void initSTEP()
 
 void initTRIGER()
 {
-	HAL_TIM_PWM_Start(&htim1 , TIM_CHANNEL_1) ;
-	HAL_TIM_PWM_Start(&htim1 , TIM_CHANNEL_2) ;
+	HAL_TIM_PWM_Start(&htim2 , TIM_CHANNEL_1) ;
+	HAL_TIM_PWM_Start(&htim2 , TIM_CHANNEL_2) ;
 }
 
 void sprawdzRadio()
@@ -202,21 +202,66 @@ void pokazPomiar()
 	if(sP>320)
 		sP=320;
 
-	printf("Przyspieszenie : %f X | %f Y | m/s^2 \r\n", XaxisMS, YaxisMS);
-	//printf("Odleglosc: %i lewy | %i prawy | cm \r\n\n", sL, sP);
+	//printf("Przyspieszenie : %f X | %f Y | m/s^2 \r\n", XaxisMS, YaxisMS);
+	printf("%i L | %i P | cm         \r\n\n", sL, sP);
+}
+
+void rejestruj()
+{
+	int P=ECHOP_Pulse/64/58; //odległość w cm
+	int L=ECHOL_Pulse/64/58; //odległość w cm
+	//wykrywamy błędne dane i zawieszenia
+	if(P>500 || L>500)
+	{
+		resetuj=1;
+		return ;
+	}
+	else if(P<=0 || L<=0 )
+		return ;
+	else
+		resetuj=0;
+
+	//resetuje jezeli blad sie powtorzy
+	if(resetuj==1)
+	{
+		NVIC_SystemReset();
+		HAL_Delay(1000);
+		resetuj=0;
+		return;
+	}
+
+	//zapisz dane do histori
+	if(nP<n){
+		sP[nP][0]=ECHOP_Pulse/64/58;
+		sL[nP][0]=ECHOL_Pulse/64/58;
+		sP[nP][1]=0;
+		sL[nP][1]=0;
+		nP++;
+	}else
+	{
+		sP[nP%n][1]=ECHOP_Pulse/64/58;
+		sL[nP%n][1]=ECHOL_Pulse/64/58;
+		sP[nP%n][0]=0;
+		sL[nP%n][0]=0;
+		nP++;
+	}
+
+	//cofnij wskaźnik
+	if(nP==2*n)
+		nP=0;
 }
 /*
 void odczytPrzys()
 {
-	int16_t Xaxis = 0, Yaxis = 0;
+	int16_t Xaxis = 1, Yaxis = 1;
+	int8_t X = 1, Y = 1;
+	X=ADXL345_odczyt(ADXL345_X, 1);
+	Xaxis = X << 8;
+	XaxisMS = ((float)Xaxis*19.8)/(float)INT16_MAX;
 
-	readI2C(ADXL345_X, 6);
-	XaxisMS = Data[1] << 8;
-	//XaxisMS = ((float)Xaxis*ADXL345_RANGE)/(float)INT16_MAX;
-
-	readI2C(ADXL345_Y, 6);
-	YaxisMS = Data[1] << 8;
-	//YaxisMS = ((float)Yaxis*ADXL345_RANGE)/(float)INT16_MAX;
+	Y=ADXL345_odczyt(ADXL345_Y, 1);
+	Yaxis = Y << 8;
+	YaxisMS = ((float)Yaxis*19.8)/(float)INT16_MAX;
 }
 */
 /* USER CODE END 0 */
@@ -249,14 +294,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-  MX_TIM1_Init();
   MX_TIM3_Init();
   MX_USART2_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  initDWT();
-  //initADXL345();
   initSTEP();
+  //initADXL345();
+  initDWT();
   initTRIGER();
 
   /* USER CODE END 2 */
@@ -278,9 +323,11 @@ int main(void)
 	  else if(komenda==3)
 		  jazda(3);
 
-	  //odczytPrzys();
+	  //pokazPomiar();
 
-	  pokazPomiar();
+	  rejestruj();
+
+	  //decyduj();
 
 	  HAL_Delay(200);
   }
