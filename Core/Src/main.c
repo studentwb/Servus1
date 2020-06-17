@@ -41,13 +41,14 @@
 /* USER CODE BEGIN PD */
 
 //#define n 100 //rozmiar historii pomiarów
+/*
 #define ADXL345_DEVICE 0x53<<1
 #define ADXL345_POWER 0x2D
 #define ADXL345_X 0x08
 #define ADXL345_Y 0x0B
 #define ADXL345_Z 0x0E
 #define ADXL345_RANGE 0x31
-
+*/
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -66,7 +67,6 @@ volatile _Bool ECHOP_High;
 volatile uint32_t ECHOL_Pulse;
 volatile uint32_t ECHOP_Pulse;
 
-uint8_t Data[6];
 float XaxisMS;
 float YaxisMS;
 //double sL[n]; //odleglosc od lewego czujnika z 10 sekund
@@ -106,7 +106,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/*
 void writeI2C(uint8_t r, uint8_t wart)
 {
 	uint8_t data[2];
@@ -120,7 +120,7 @@ void readI2C(uint8_t r, uint8_t ile)
 	HAL_I2C_Mem_Read(&hi2c1, ADXL345_DEVICE, r, 1, Data, ile, 100);
 }
 
-
+*/
 void initDWT()
 {
 	CoreDebug->DEMCR &= ~0x01000000;
@@ -129,7 +129,7 @@ void initDWT()
 	DWT->CTRL |=  0x00000001;
 	DWT->CYCCNT = 0;
 }
-
+/*
 void initADXL345()
 {
 	readI2C(0x00, 1);
@@ -139,7 +139,7 @@ void initADXL345()
 
 	writeI2C(ADXL345_RANGE, 0x01);
 }
-
+*/
 void initSTEP()
 {
 	HAL_GPIO_WritePin(MP_POW_GPIO_Port, MP_POW_Pin, GPIO_PIN_SET);
@@ -150,8 +150,8 @@ void initSTEP()
 
 void initTRIGER()
 {
+	HAL_TIM_PWM_Start(&htim1 , TIM_CHANNEL_1) ;
 	HAL_TIM_PWM_Start(&htim1 , TIM_CHANNEL_2) ;
-	HAL_TIM_PWM_Start(&htim1 , TIM_CHANNEL_3) ;
 }
 
 void sprawdzRadio()
@@ -203,9 +203,9 @@ void pokazPomiar()
 		sP=320;
 
 	printf("Przyspieszenie : %f X | %f Y | m/s^2 \r\n", XaxisMS, YaxisMS);
-	printf("Odleglosc: %i lewy | %i prawy | cm \r\n\n", sL, sP);
+	//printf("Odleglosc: %i lewy | %i prawy | cm \r\n\n", sL, sP);
 }
-
+/*
 void odczytPrzys()
 {
 	int16_t Xaxis = 0, Yaxis = 0;
@@ -218,6 +218,7 @@ void odczytPrzys()
 	YaxisMS = Data[1] << 8;
 	//YaxisMS = ((float)Yaxis*ADXL345_RANGE)/(float)INT16_MAX;
 }
+*/
 /* USER CODE END 0 */
 
 /**
@@ -254,7 +255,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   initDWT();
-  initADXL345();
+  //initADXL345();
   initSTEP();
   initTRIGER();
 
@@ -277,11 +278,11 @@ int main(void)
 	  else if(komenda==3)
 		  jazda(3);
 
-	  odczytPrzys();
+	  //odczytPrzys();
 
 	  pokazPomiar();
 
-	  HAL_Delay(20);
+	  HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
